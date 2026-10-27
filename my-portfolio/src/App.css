@@ -23,6 +23,17 @@ a {
 
 .portfolio {
   width: 100%;
+  timeline-scope: --floor-entry;
+}
+
+.portfolio::after {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  background: #080b18;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
 }
 
 .hero-screen {
@@ -100,6 +111,8 @@ a {
 }
 
 .explore-section {
+  position: relative;
+  isolation: isolate;
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
@@ -107,8 +120,157 @@ a {
   justify-content: space-between;
   padding: 10vh 11% 0;
   color: #f7e9d5;
-  background: #171725;
+  background:
+    linear-gradient(#080b1870, #080b1870),
+    url('/firstfloor.png') center center / cover no-repeat;
   scroll-margin-top: 0;
+  view-timeline-name: --floor-entry;
+  view-timeline-axis: block;
+}
+
+.floor-scene {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 150svh);
+  aspect-ratio: 3 / 2;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.room-hotspot {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.tv-hotspot {
+  top: 34%;
+  left: 4.5%;
+  width: 24%;
+  height: 21%;
+}
+
+.tv-screen-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.phone-hotspot {
+  top: 36%;
+  left: 59%;
+  width: 24%;
+  height: 22%;
+}
+
+.phone-art {
+  width: 68%;
+  height: 68%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  transform: translateX(-8%);
+  transform-origin: center bottom;
+  animation: phone-ring 1.15s ease-in-out infinite;
+}
+
+.hotspot-hint {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  padding: 6px 10px;
+  border: 1px solid #f7e9d588;
+  background: #080b18d9;
+  color: #f7e9d5;
+  font-size: 11px;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.room-hotspot:hover .hotspot-hint,
+.room-hotspot:focus-visible .hotspot-hint {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.room-hotspot:focus-visible {
+  outline: 3px solid #f7e9d5;
+  outline-offset: 3px;
+}
+
+.detail-dialog {
+  position: fixed;
+  width: min(440px, calc(100% - 32px));
+  max-width: none;
+  border: 1px solid #f7e9d566;
+  padding: 36px;
+  background: #171725;
+  color: #f7e9d5;
+}
+
+.detail-dialog::backdrop {
+  background: #05060bd9;
+  backdrop-filter: blur(5px);
+}
+
+.detail-dialog h2 {
+  margin: 0 0 14px;
+  font-size: clamp(24px, 5vw, 34px);
+  font-weight: 500;
+}
+
+.detail-dialog > p:not(.section-kicker) {
+  margin: 0;
+  color: #d3c7b9;
+  line-height: 1.7;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.dialog-action {
+  display: inline-block;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 4px;
+  text-decoration: none;
+}
+
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 22px;
+}
+
+@supports (animation-timeline: view()) {
+  .portfolio::after {
+    animation: level-transition linear both;
+    animation-timeline: --floor-entry;
+    animation-range: entry 0% entry 100%;
+  }
+
+  .explore-section {
+    animation: floor-fade-in linear both;
+    animation-timeline: --floor-entry;
+    animation-range: entry 50% entry 100%;
+  }
 }
 
 .explore-content {
@@ -188,8 +350,68 @@ footer a {
   }
 }
 
+@keyframes level-transition {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes floor-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes phone-ring {
+  0%,
+  38%,
+  100% {
+    transform: translateX(-8%) rotate(0deg);
+  }
+
+  4%,
+  12%,
+  20%,
+  28%,
+  36% {
+    transform: translateX(-8%) rotate(-7deg);
+  }
+
+  8%,
+  16%,
+  24%,
+  32% {
+    transform: translateX(-8%) rotate(7deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scroll-cue-arrow {
+    animation: none;
+  }
+
+  .hotspot-hint {
+    transition: none;
+  }
+
+  .phone-art {
+    animation: none;
+  }
+
+  .portfolio::after,
+  .explore-section {
     animation: none;
   }
 }
@@ -213,6 +435,19 @@ footer a {
   .explore-section {
     min-height: 100svh;
     padding: 9vh 8% 0;
+    background-position: center 24svh;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+  }
+
+  .floor-scene {
+    top: 24svh;
+    width: 100%;
+    transform: translateX(-50%);
+  }
+
+  .detail-dialog {
+    padding: 32px 24px;
   }
 
   .project-row {
