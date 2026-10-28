@@ -58,6 +58,10 @@ function FirstFloor() {
         </ul> */}
       </div>
 
+      <a className="floor-next" href="#staircase">
+        Continue upstairs <span aria-hidden="true">↓</span>
+      </a>
+
       {/* <footer>
         <span>© 2026 Babin Tandukar</span>
         <nav>
