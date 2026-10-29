@@ -23,19 +23,20 @@ const imageByName = Object.fromEntries(
 
 const projectImages = galleryProjects.map((project) => resolveProjectImages(project, imageByName))
 
-function ProjectGallery({ embedded = false }) {
+function ProjectGallery({ embedded = false, galleryRef }) {
   const [activeIndex, setActiveIndex] = useState(null)
 
   return (
     <section
       className={`gallery-wall${embedded ? ' embedded' : ''}`}
       id="projects"
+      ref={galleryRef}
       aria-labelledby="gallery-title"
     >
       <div className="gallery-wall-inner">
         <header className="gallery-wall-heading">
           <p className="gallery-eyebrow">Selected work</p>
-          <h1 id="gallery-title">A collection of things made</h1>
+          <h1 id="gallery-title">A collection of personal projects</h1>
           <p>Independent projects and work built with thoughtful teams.</p>
         </header>
 
