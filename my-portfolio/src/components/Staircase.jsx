@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import ProjectGallery from './molecules/ProjectGallery'
 
 const MODEL_URL = '/stairsandgiril.glb'
 const WALK_CLIP = 'Mixamo_StairsWalk'
@@ -6,7 +7,6 @@ const WALK_CLIP = 'Mixamo_StairsWalk'
 function Staircase() {
   const sectionRef = useRef(null)
   const canvasRef = useRef(null)
-  const backgroundRef = useRef(null)
   const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
@@ -27,14 +27,15 @@ function Staircase() {
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
-      alpha: false,
+      alpha: true,
       powerPreference: 'high-performance',
     })
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    renderer.setClearColor(0x111217, 0)
+    renderer.setClearColor(0xd7cebc, 0)
 
     const scene = new THREE.Scene()
+    scene.background = null
     scene.add(new THREE.HemisphereLight(0xffefd8, 0x343b49, 2.2))
 
     const keyLight = new THREE.DirectionalLight(0xffe1b5, 3.2)
@@ -82,7 +83,7 @@ function Staircase() {
           }
         }
 
-        camera.position.copy(cameraTarget).addScaledVector(cameraDirection, frameDistance * 1.04)
+        camera.position.copy(cameraTarget).addScaledVector(cameraDirection, frameDistance * 1.08)
         camera.lookAt(cameraTarget)
       }
       renderer.render(scene, camera)
@@ -95,11 +96,6 @@ function Staircase() {
         ? 1
         : THREE.MathUtils.clamp(1 - bounds.top / window.innerHeight, 0, 1)
       const easedEntrance = entranceProgress ** 2 * (3 - 2 * entranceProgress)
-
-      if (backgroundRef.current) {
-        backgroundRef.current.style.opacity = String(easedEntrance)
-        backgroundRef.current.style.transform = `rotateY(${-82 * (1 - easedEntrance)}deg) scale(${1.08 - 0.08 * easedEntrance})`
-      }
 
       if (modelGroup) {
         modelGroup.rotation.y = -Math.PI / 2 * (1 - easedEntrance)
@@ -140,13 +136,22 @@ function Staircase() {
         modelScene.scale.setScalar(scale)
         modelScene.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale)
 
+        const stairsMesh = modelScene.getObjectByName('Stairs')
+        if (stairsMesh?.material?.name === 'Stair_Stone') {
+          stairsMesh.material.color.set('#d7cebc')
+          stairsMesh.material.roughness = 0.92
+          stairsMesh.material.needsUpdate = true
+        }
+
         const scaledSize = size.multiplyScalar(scale)
         const target = new THREE.Vector3(0, scaledSize.y * 0.48, 0)
+        target.y += scaledSize.y * 0.38
         cameraTarget = target
         cameraDirection = new THREE.Vector3(1, 0, 0)
-        modelScene.updateMatrixWorld(true)
-        modelBounds = new THREE.Box3().setFromObject(modelScene)
-        target.y = scaledSize.y * 0.78
+
+        modelGroup.updateMatrixWorld(true)
+        modelBounds = new THREE.Box3().setFromObject(modelGroup)
+        modelBounds.getCenter(cameraTarget)
 
         mixer = new THREE.AnimationMixer(modelScene)
         const walkClip = gltf.animations.find((clip) => clip.name === WALK_CLIP)
@@ -195,7 +200,7 @@ function Staircase() {
       loadScene().catch(() => {
         if (!disposed) setLoadError(true)
       })
-    })
+    }, { rootMargin: '150% 0px' })
 
     observer.observe(section)
 
@@ -207,21 +212,23 @@ function Staircase() {
   }, [])
 
   return (
-    <section className="staircase-section" id="staircase" ref={sectionRef}>
-      <div className="staircase-sticky">
-        <div className="staircase-background" ref={backgroundRef} aria-hidden="true" />
-        <canvas
-          className="staircase-canvas"
-          ref={canvasRef}
-          aria-label="A character climbing a staircase, animated as you scroll"
-        />
-        <div className="staircase-heading">
-          <p className="section-kicker">Level 03</p>
-          <h2>Upward</h2>
+    <section className="staircase-page" id="staircase">
+      <div className="staircase-section" ref={sectionRef}>
+        <div className="staircase-sticky">
+          <ProjectGallery embedded />
+          <canvas
+            className="staircase-canvas"
+            ref={canvasRef}
+            aria-label="A character climbing the staircase as you scroll"
+          />
+          <div className="staircase-heading">
+            <p className="section-kicker">Level 03</p>
+            <h2>Upward</h2>
+          </div>
+          <a className="staircase-back" href="#explore">Back downstairs</a>
+          {loadError && <p className="staircase-error">The staircase scene could not be loaded.</p>}
+          <span className="staircase-scroll-cue" aria-hidden="true">Scroll to climb</span>
         </div>
-        <a className="staircase-back" href="#explore">Back downstairs</a>
-        {loadError && <p className="staircase-error">The staircase scene could not be loaded.</p>}
-        <span className="staircase-scroll-cue" aria-hidden="true">Scroll to climb</span>
       </div>
     </section>
   )
