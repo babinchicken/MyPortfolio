@@ -10,10 +10,6 @@ const screenshotFiles = import.meta.glob('../../assets/images/**/*.{png,jpg,jpeg
   query: '?url',
 })
 
-const galleryProjects = projects.filter(
-  (project) => project.type?.trim().toLowerCase() === 'personal project',
-)
-
 const imageByName = Object.fromEntries(
   Object.entries(screenshotFiles).map(([path, url]) => [
     path.split('/').pop().replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, ''),
@@ -21,23 +17,37 @@ const imageByName = Object.fromEntries(
   ]),
 )
 
-const projectImages = galleryProjects.map((project) => resolveProjectImages(project, imageByName))
-
-function ProjectGallery({ embedded = false, galleryRef }) {
+function ProjectGallery({
+  embedded = false,
+  galleryRef,
+  id = 'projects',
+  title = 'A collection of personal projects',
+  eyebrow = 'Selected work',
+  subtitle = 'Independent projects and work built with thoughtful teams.',
+  filterType = 'personal project',
+}) {
   const [activeIndex, setActiveIndex] = useState(null)
+
+  const galleryProjects = projects.filter((project) => {
+    if (!filterType || filterType === 'all') return true
+    return project.type?.trim().toLowerCase() === filterType.trim().toLowerCase()
+  })
+
+  const projectImages = galleryProjects.map((project) => resolveProjectImages(project, imageByName))
+  const titleId = `${id}-title`
 
   return (
     <section
       className={`gallery-wall${embedded ? ' embedded' : ''}`}
-      id="projects"
+      id={id}
       ref={galleryRef}
-      aria-labelledby="gallery-title"
+      aria-labelledby={titleId}
     >
       <div className="gallery-wall-inner">
         <header className="gallery-wall-heading">
-          <p className="gallery-eyebrow">Selected work</p>
-          <h1 id="gallery-title">A collection of personal projects</h1>
-          <p>Independent projects and work built with thoughtful teams.</p>
+          <p className="gallery-eyebrow">{eyebrow}</p>
+          <h1 id={titleId}>{title}</h1>
+          <p>{subtitle}</p>
         </header>
 
         <div className="gallery-grid">

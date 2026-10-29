@@ -59,7 +59,8 @@ function Staircase() {
     let climbAction = null
     let turnAction = null
     let animationMode = 'uninitialized'
-    let turnTimer = 0
+    const CLIMB_THRESHOLD = 0.15
+    let hasPlayedEntranceTurn = false
     let animationFrame = 0
     let previousFrameTime = 0
     let animationGeneration = 0
@@ -129,7 +130,6 @@ function Staircase() {
 
     const playIdle = () => {
       if (!mixer || !idleAction || animationMode === 'idle') return
-      window.clearTimeout(turnTimer)
       stopLiveAnimation()
       idleAction.reset()
       idleAction.enabled = true
@@ -146,7 +146,6 @@ function Staircase() {
 
     const playClimb = (progress) => {
       if (!mixer || !climbAction) return
-      window.clearTimeout(turnTimer)
       stopLiveAnimation()
 
       if (animationMode !== 'climb') {
@@ -166,8 +165,11 @@ function Staircase() {
     }
 
     const playTurn = () => {
-      if (!mixer || !turnAction || animationMode === 'turn') return
-      window.clearTimeout(turnTimer)
+      if (!mixer || animationMode === 'turn') return
+      if (!turnAction) {
+        playIdle()
+        return
+      }
       stopLiveAnimation()
       idleAction?.stop()
       climbAction?.stop()
@@ -187,7 +189,7 @@ function Staircase() {
       if (event.action === turnAction && animationMode === 'turn') playIdle()
     }
 
-    const updateScrollFrame = (fromScroll = false) => {
+    const updateScrollFrame = () => {
       const bounds = section.getBoundingClientRect()
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const entranceProgress = reducedMotion
@@ -202,25 +204,51 @@ function Staircase() {
 
       galleryRef.current?.style.setProperty('--wall-enter', String(easedEntrance))
 
+      // If user scrolls back up toward the previous section, reset so turn plays on next entry
+      if (bounds.top > window.innerHeight * 0.25) {
+        hasPlayedEntranceTurn = false
+      }
+
       if (bounds.top > window.innerHeight || bounds.bottom < 0) return
+
+      const isFullyInView = bounds.top <= 2
+
+      if (!isFullyInView) {
+        // While entering into view, initialize with idle
+        if (animationMode === 'uninitialized') {
+          playIdle()
+        }
+        renderFrame()
+        return
+      }
 
       const scrollableDistance = Math.max(1, section.offsetHeight - window.innerHeight)
       const progress = THREE.MathUtils.clamp(-bounds.top / scrollableDistance, 0, 1)
 
-      if (progress <= 0.001) {
-        playIdle()
-      } else if (progress >= 0.999) {
-        if (animationMode !== 'turn') {
-          playClimb(progress)
+      // When page first comes fully into view, play turn animation (which transitions to idle)
+      if (!hasPlayedEntranceTurn) {
+        hasPlayedEntranceTurn = true
+        if (progress <= CLIMB_THRESHOLD) {
+          playTurn()
+          return
+        }
+      }
+
+      if (progress <= CLIMB_THRESHOLD) {
+        // Within top buffer: maintain turn or idle; return to idle if scrolling back up
+        if (animationMode === 'climb') {
+          playIdle()
+        } else if (animationMode === 'uninitialized') {
           playTurn()
         }
       } else {
-        playClimb(progress)
-
-        if (fromScroll) {
-          window.clearTimeout(turnTimer)
-          turnTimer = window.setTimeout(playTurn, 220)
-        }
+        // After more strong scroll: climb the stairs based on scroll progress
+        const climbProgress = THREE.MathUtils.clamp(
+          (progress - CLIMB_THRESHOLD) / (1 - CLIMB_THRESHOLD),
+          0,
+          1
+        )
+        playClimb(climbProgress)
       }
 
       renderFrame()
@@ -289,7 +317,6 @@ function Staircase() {
     cleanupScene = () => {
       window.removeEventListener('resize', resize)
       window.removeEventListener('scroll', handleScroll)
-      window.clearTimeout(turnTimer)
       stopLiveAnimation()
       mixer?.removeEventListener('finished', handleAnimationFinished)
       mixer?.stopAllAction()
@@ -325,7 +352,7 @@ function Staircase() {
     <section className="staircase-page" id="staircase">
       <div className="staircase-section" ref={sectionRef}>
         <div className="staircase-sticky">
-          <ProjectGallery embedded galleryRef={galleryRef} />
+          <ProjectGallery embedded galleryRef={galleryRef} id="staircase-projects" />
           <canvas
             className="staircase-canvas"
             ref={canvasRef}
@@ -336,6 +363,7 @@ function Staircase() {
             <h2>Upward</h2>
           </div>
           <a className="staircase-back" href="#explore">Back downstairs</a>
+          <a className="staircase-next" href="#hallway">To hallway <span aria-hidden="true">↓</span></a>
           {loadError && <p className="staircase-error">The staircase scene could not be loaded.</p>}
           <span className="staircase-scroll-cue" aria-hidden="true">Scroll to climb</span>
         </div>
