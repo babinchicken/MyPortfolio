@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import ProjectGallery from './molecules/ProjectGallery'
 
-const MODEL_URL = '/stairsandgiril.glb'
-const WALK_CLIP = 'Mixamo_StairsWalk'
+const MODEL_URL = '/stairswithme.glb'
+const CLIMB_CLIP = 'Me_StairsClimb'
+const TURN_CLIP = 'Me_IdleTurn'
+const IDLE_CLIP = 'Me_Idle'
 
 function Staircase() {
   const sectionRef = useRef(null)
   const canvasRef = useRef(null)
+  const galleryRef = useRef(null)
   const [loadError, setLoadError] = useState(false)
 
   useEffect(() => {
@@ -52,7 +55,14 @@ function Staircase() {
     let modelBounds = null
     let modelGroup = null
     let mixer = null
-    let walkAction = null
+    let idleAction = null
+    let climbAction = null
+    let turnAction = null
+    let animationMode = 'uninitialized'
+    let turnTimer = 0
+    let animationFrame = 0
+    let previousFrameTime = 0
+    let animationGeneration = 0
 
     const resize = () => {
       const { width, height } = canvas.getBoundingClientRect()
@@ -89,7 +99,95 @@ function Staircase() {
       renderer.render(scene, camera)
     }
 
-    const updateScrollFrame = () => {
+    const renderFrame = () => renderer.render(scene, camera)
+
+    const stopLiveAnimation = () => {
+      animationGeneration += 1
+      if (animationFrame) cancelAnimationFrame(animationFrame)
+      animationFrame = 0
+      previousFrameTime = 0
+    }
+
+    const startLiveAnimation = () => {
+      if (animationFrame || disposed) return
+      const generation = ++animationGeneration
+
+      const animate = (time) => {
+        if (generation !== animationGeneration || disposed) return
+        animationFrame = 0
+        if (disposed || animationMode === 'climb') return
+        const delta = previousFrameTime ? Math.min((time - previousFrameTime) / 1000, 0.05) : 0
+        previousFrameTime = time
+        mixer?.update(delta)
+        if (generation !== animationGeneration || disposed) return
+        renderFrame()
+        animationFrame = requestAnimationFrame(animate)
+      }
+
+      animationFrame = requestAnimationFrame(animate)
+    }
+
+    const playIdle = () => {
+      if (!mixer || !idleAction || animationMode === 'idle') return
+      window.clearTimeout(turnTimer)
+      stopLiveAnimation()
+      idleAction.reset()
+      idleAction.enabled = true
+      idleAction.paused = false
+      idleAction.setLoop(THREE.LoopRepeat, Infinity)
+      idleAction.setEffectiveWeight(1)
+      idleAction.play()
+      climbAction?.stop()
+      turnAction?.stop()
+      animationMode = 'idle'
+      previousFrameTime = 0
+      startLiveAnimation()
+    }
+
+    const playClimb = (progress) => {
+      if (!mixer || !climbAction) return
+      window.clearTimeout(turnTimer)
+      stopLiveAnimation()
+
+      if (animationMode !== 'climb') {
+        idleAction?.stop()
+        turnAction?.stop()
+        climbAction.reset()
+        climbAction.enabled = true
+        climbAction.paused = true
+        climbAction.setEffectiveWeight(1)
+        climbAction.play()
+        animationMode = 'climb'
+      }
+
+      climbAction.time = THREE.MathUtils.clamp(progress, 0, 1) * climbAction.getClip().duration
+      mixer.update(0)
+      renderFrame()
+    }
+
+    const playTurn = () => {
+      if (!mixer || !turnAction || animationMode === 'turn') return
+      window.clearTimeout(turnTimer)
+      stopLiveAnimation()
+      idleAction?.stop()
+      climbAction?.stop()
+      turnAction.reset()
+      turnAction.enabled = true
+      turnAction.paused = false
+      turnAction.setLoop(THREE.LoopOnce, 1)
+      turnAction.clampWhenFinished = true
+      turnAction.setEffectiveWeight(1)
+      turnAction.play()
+      animationMode = 'turn'
+      previousFrameTime = 0
+      startLiveAnimation()
+    }
+
+    const handleAnimationFinished = (event) => {
+      if (event.action === turnAction && animationMode === 'turn') playIdle()
+    }
+
+    const updateScrollFrame = (fromScroll = false) => {
       const bounds = section.getBoundingClientRect()
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const entranceProgress = reducedMotion
@@ -102,17 +200,30 @@ function Staircase() {
         modelGroup.position.y = 1.6 * (1 - easedEntrance)
       }
 
+      galleryRef.current?.style.setProperty('--wall-enter', String(easedEntrance))
+
       if (bounds.top > window.innerHeight || bounds.bottom < 0) return
 
       const scrollableDistance = Math.max(1, section.offsetHeight - window.innerHeight)
       const progress = THREE.MathUtils.clamp(-bounds.top / scrollableDistance, 0, 1)
 
-      if (walkAction && mixer) {
-        walkAction.time = progress * walkAction.getClip().duration
-        mixer.update(0)
+      if (progress <= 0.001) {
+        playIdle()
+      } else if (progress >= 0.999) {
+        if (animationMode !== 'turn') {
+          playClimb(progress)
+          playTurn()
+        }
+      } else {
+        playClimb(progress)
+
+        if (fromScroll) {
+          window.clearTimeout(turnTimer)
+          turnTimer = window.setTimeout(playTurn, 220)
+        }
       }
 
-      renderer.render(scene, camera)
+      renderFrame()
     }
 
     const loader = new GLTFLoader()
@@ -154,15 +265,11 @@ function Staircase() {
         modelBounds.getCenter(cameraTarget)
 
         mixer = new THREE.AnimationMixer(modelScene)
-        const walkClip = gltf.animations.find((clip) => clip.name === WALK_CLIP)
-          ?? gltf.animations.find((clip) => clip.name.toLowerCase().includes('stairs'))
-          ?? gltf.animations[0]
-
-        if (walkClip) {
-          walkAction = mixer.clipAction(walkClip)
-          walkAction.play()
-          walkAction.paused = true
-        }
+        const clips = Object.fromEntries(gltf.animations.map((clip) => [clip.name, clip]))
+        idleAction = clips[IDLE_CLIP] ? mixer.clipAction(clips[IDLE_CLIP]) : null
+        climbAction = clips[CLIMB_CLIP] ? mixer.clipAction(clips[CLIMB_CLIP]) : null
+        turnAction = clips[TURN_CLIP] ? mixer.clipAction(clips[TURN_CLIP]) : null
+        mixer.addEventListener('finished', handleAnimationFinished)
 
         resize()
         updateScrollFrame()
@@ -173,7 +280,7 @@ function Staircase() {
       },
     )
 
-    const handleScroll = () => updateScrollFrame()
+    const handleScroll = () => updateScrollFrame(true)
     window.addEventListener('resize', resize)
     window.addEventListener('scroll', handleScroll, { passive: true })
     resize()
@@ -182,6 +289,9 @@ function Staircase() {
     cleanupScene = () => {
       window.removeEventListener('resize', resize)
       window.removeEventListener('scroll', handleScroll)
+      window.clearTimeout(turnTimer)
+      stopLiveAnimation()
+      mixer?.removeEventListener('finished', handleAnimationFinished)
       mixer?.stopAllAction()
       scene.traverse((object) => {
         if (!object.isMesh) return
@@ -215,7 +325,7 @@ function Staircase() {
     <section className="staircase-page" id="staircase">
       <div className="staircase-section" ref={sectionRef}>
         <div className="staircase-sticky">
-          <ProjectGallery embedded />
+          <ProjectGallery embedded galleryRef={galleryRef} />
           <canvas
             className="staircase-canvas"
             ref={canvasRef}

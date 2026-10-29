@@ -156,13 +156,19 @@ a {
   top: 0;
   right: 0;
   left: 0;
-  height: 67%;
+  height: 100%;
   overflow: hidden;
+  --wall-enter: 0;
   padding: clamp(18px, 3vh, 30px) 0 12px;
   background: transparent;
+  opacity: var(--wall-enter);
+  transform: perspective(1400px) rotateX(calc((1 - var(--wall-enter)) * -9deg)) translateY(calc((1 - var(--wall-enter)) * 34px));
+  transform-origin: center top;
+  will-change: opacity, transform;
 }
 
 .staircase-page .gallery-wall-inner {
+  height: 100%;
   max-width: none;
 }
 
@@ -186,8 +192,6 @@ a {
 }
 
 .staircase-page .gallery-grid {
-  position: relative;
-  top: -42px;
   display: flex;
   align-items: flex-start;
   gap: clamp(14px, 2vw, 28px);
@@ -201,12 +205,14 @@ a {
 .staircase-page .gallery-card {
   flex: 0 0 clamp(190px, 18vw, 245px);
   perspective: none;
+  opacity: calc(0.35 + var(--wall-enter, 1) * 0.65);
+  translate: 0 calc((1 - var(--wall-enter, 1)) * 46px);
+  will-change: opacity, translate;
 }
 
-.staircase-page .gallery-card:nth-child(1) { transform: translateY(60px); }
-.staircase-page .gallery-card:nth-child(2) { transform: translateY(40px); }
-.staircase-page .gallery-card:nth-child(3) { transform: translateY(20px); }
-.staircase-page .gallery-card:nth-child(4) { transform: translateY(0); }
+.staircase-page .gallery-card:nth-child(1) { margin-top: 200px; }
+.staircase-page .gallery-card:nth-child(2) { margin-top: 120px; }
+.staircase-page .gallery-card:nth-child(3) { margin-top: 40px; }
 
 .staircase-page .gallery-card-frame {
   padding: 6px;
