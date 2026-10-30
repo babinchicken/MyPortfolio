@@ -23,25 +23,14 @@ a {
 
 .portfolio {
   width: 100%;
-  timeline-scope: --floor-entry, --staircase-entry;
+  timeline-scope: --floor-entry, --staircase-entry, --hallway-entry;
 }
 
-.portfolio::before {
+.level-transition-overlay {
   position: fixed;
   z-index: 10;
   inset: 0;
   background: #080b18;
-  content: '';
-  opacity: 0;
-  pointer-events: none;
-}
-
-.portfolio::after {
-  position: fixed;
-  z-index: 10;
-  inset: 0;
-  background: #080b18;
-  content: '';
   opacity: 0;
   pointer-events: none;
 }
@@ -214,93 +203,113 @@ a {
 .staircase-page .gallery-card:nth-child(2) { margin-top: 120px; }
 .staircase-page .gallery-card:nth-child(3) { margin-top: 40px; }
 
-.staircase-page .gallery-card-frame {
+.staircase-page .gallery-card-frame,
+.hallway-page .gallery-card-frame {
   padding: 6px;
   box-shadow: 0 9px 18px #29231a38, 0 2px 5px #29231a40;
 }
 
 .staircase-page .gallery-card:hover .gallery-card-frame,
-.staircase-page .gallery-card:focus-within .gallery-card-frame {
+.staircase-page .gallery-card:focus-within .gallery-card-frame,
+.hallway-page .gallery-card:hover .gallery-card-frame,
+.hallway-page .gallery-card:focus-within .gallery-card-frame {
   transform: translateY(-4px);
 }
 
-.staircase-page .gallery-card-artwork {
+.staircase-page .gallery-card-artwork,
+.hallway-page .gallery-card-artwork {
   aspect-ratio: 1.7 / 1;
 }
 
-.staircase-page .project-artwork-fallback {
+.staircase-page .project-artwork-fallback,
+.hallway-page .project-artwork-fallback {
   gap: 7px;
   padding: 17px;
 }
 
-.staircase-page .project-artwork-type {
+.staircase-page .project-artwork-type,
+.hallway-page .project-artwork-type {
   font-size: 8px;
 }
 
-.staircase-page .project-artwork-icon {
+.staircase-page .project-artwork-icon,
+.hallway-page .project-artwork-icon {
   top: 11px;
   right: 11px;
   width: 28px;
   font-size: 10px;
 }
 
-.staircase-page .project-artwork-fallback > strong {
+.staircase-page .project-artwork-fallback > strong,
+.hallway-page .project-artwork-fallback > strong {
   font-size: clamp(21px, 2.2vw, 28px);
 }
 
-.staircase-page .project-artwork-description {
+.staircase-page .project-artwork-description,
+.hallway-page .project-artwork-description {
   font-size: 10px;
   -webkit-line-clamp: 1;
 }
 
-.staircase-page .gallery-card-copy {
+.staircase-page .gallery-card-copy,
+.hallway-page .gallery-card-copy {
   gap: 6px;
   padding: 10px 11px 9px;
 }
 
-.staircase-page .gallery-card-title-row h2 {
+.staircase-page .gallery-card-title-row h2,
+.hallway-page .gallery-card-title-row h2 {
   font-size: clamp(16px, 1.5vw, 20px);
 }
 
-.staircase-page .gallery-card-icon {
+.staircase-page .gallery-card-icon,
+.hallway-page .gallery-card-icon {
   width: 27px;
   font-size: 9px;
 }
 
-.staircase-page .gallery-card-summary {
+.staircase-page .gallery-card-summary,
+.hallway-page .gallery-card-summary {
   font-size: 10px;
   -webkit-line-clamp: 1;
 }
 
-.staircase-page .gallery-card-role {
+.staircase-page .gallery-card-role,
+.hallway-page .gallery-card-role {
   font-size: 9px;
 }
 
-.staircase-page .technology-tags {
+.staircase-page .technology-tags,
+.hallway-page .technology-tags {
   gap: 4px;
 }
 
-.staircase-page .technology-tags li {
+.staircase-page .technology-tags li,
+.hallway-page .technology-tags li {
   padding: 3px 5px;
   font-size: 9px;
 }
 
-.staircase-page .gallery-card-ownership .project-status {
+.staircase-page .gallery-card-ownership .project-status,
+.hallway-page .gallery-card-ownership .project-status {
   min-height: 19px;
   padding: 2px 5px;
   font-size: 9px;
 }
 
-.staircase-page .gallery-card-ownership > span:last-child {
+.staircase-page .gallery-card-ownership > span:last-child,
+.hallway-page .gallery-card-ownership > span:last-child {
   font-size: 10px;
 }
 
-.staircase-page .gallery-card-links {
+.staircase-page .gallery-card-links,
+.hallway-page .gallery-card-links {
   gap: 12px;
   padding: 0 12px 11px;
 }
 
-.staircase-page .gallery-card-links a {
+.staircase-page .gallery-card-links a,
+.hallway-page .gallery-card-links a {
   font-size: 10px;
 }
 
@@ -370,7 +379,101 @@ a {
   text-transform: uppercase;
 }
 
-.staircase-error {
+.staircase-next {
+  position: absolute;
+  z-index: 4;
+  bottom: 9vh;
+  right: calc(5% + 140px);
+  color: #171725;
+  font-size: 13px;
+  text-decoration: none;
+  border-bottom: 1px solid #17172588;
+  padding-bottom: 4px;
+}
+
+/* ==========================================================================
+   Hallway Section & Straight-Aligned Gallery
+   ========================================================================== */
+
+.hallway-page {
+  background-color: #d7cebc;
+}
+
+.hallway-section {
+  position: relative;
+  height: 200svh;
+  background: #d7cebc;
+  view-timeline-name: --hallway-entry;
+  view-timeline-axis: block;
+}
+
+.hallway-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: #d7cebc;
+  perspective: 1500px;
+  perspective-origin: center;
+  background-color: #d7cebc;
+  background-image:
+    radial-gradient(ellipse at 18% 22%, #ffffff38 0 1px, transparent 1.5px),
+    radial-gradient(ellipse at 76% 65%, #62574612 0 1px, transparent 1.7px),
+    repeating-linear-gradient(2deg, transparent 0 37px, #62574608 38px, transparent 39px 74px);
+}
+
+.hallway-canvas {
+  position: relative;
+  z-index: 3;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: translateY(28svh);
+  pointer-events: none;
+}
+
+.hallway-heading {
+  position: absolute;
+  z-index: 4;
+  bottom: 8vh;
+  left: 5%;
+  pointer-events: none;
+}
+
+.hallway-heading h2 {
+  margin: 0;
+  color: #171725;
+  font-size: clamp(24px, 3vw, 38px);
+  font-weight: 400;
+}
+
+.hallway-back {
+  position: absolute;
+  z-index: 4;
+  bottom: 9vh;
+  right: 5%;
+  color: #171725;
+  font-size: 13px;
+  text-decoration: none;
+  border-bottom: 1px solid #17172588;
+  padding-bottom: 4px;
+}
+
+.hallway-scroll-cue {
+  position: absolute;
+  z-index: 4;
+  right: 0;
+  bottom: 6vh;
+  left: 0;
+  color: #171725a8;
+  font-size: 11px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.hallway-error {
   position: absolute;
   z-index: 4;
   right: 24px;
@@ -378,6 +481,72 @@ a {
   left: 24px;
   color: #ffc2b8;
   text-align: center;
+}
+
+/* Straight-aligned gallery in Hallway (rising from bottom into place) */
+.hallway-page .gallery-wall.embedded {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+  --wall-enter: 0;
+  padding: clamp(18px, 3vh, 30px) 0 12px;
+  background: transparent;
+  opacity: calc(0.15 + var(--wall-enter, 0) * 0.85);
+  transform: translateY(calc((1 - var(--wall-enter, 0)) * 160px));
+  will-change: opacity, transform;
+}
+
+.hallway-page .gallery-wall-inner {
+  height: 100%;
+  max-width: none;
+}
+
+.hallway-page .gallery-wall-heading {
+  max-width: none;
+  margin: 0 auto 12px;
+  padding: 0 clamp(18px, 4vw, 64px);
+}
+
+.hallway-page .gallery-wall-heading .gallery-eyebrow {
+  margin-bottom: 5px;
+}
+
+.hallway-page .gallery-wall-heading h1 {
+  margin: 0;
+  font-size: clamp(21px, 2.4vw, 32px);
+}
+
+.hallway-page .gallery-wall-heading > p:last-child {
+  display: none;
+}
+
+.hallway-page .gallery-grid {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(14px, 2vw, 28px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 8px clamp(18px, 4vw, 64px) 18px;
+  scrollbar-color: #786c55 #d7cebc;
+  scrollbar-width: thin;
+}
+
+/* STRAIGHT ALIGNED GALLERY CARDS: UNLIKE STAIRCASE */
+.hallway-page .gallery-card {
+  flex: 0 0 clamp(190px, 18vw, 245px);
+  perspective: none;
+  opacity: calc(0.25 + var(--wall-enter, 0) * 0.75);
+  translate: 0 calc((1 - var(--wall-enter, 0)) * 100px);
+  margin-top: 40px !important;
+  will-change: opacity, translate;
+}
+
+.hallway-page .gallery-card:nth-child(n) {
+  margin-top: 40px !important;
 }
 
 .project-status {
@@ -1187,7 +1356,8 @@ a {
 }
 
 @supports (animation-timeline: view()) {
-  .portfolio::after {
+  /* Landing <-> FirstFloor */
+  .floor-transition {
     animation: level-transition linear both;
     animation-timeline: --floor-entry;
     animation-range: entry 0% entry 100%;
@@ -1199,10 +1369,30 @@ a {
     animation-range: entry 50% entry 100%;
   }
 
-  .portfolio::before {
+  /* FirstFloor <-> Staircase */
+  .staircase-transition {
     animation: level-transition linear both;
     animation-timeline: --staircase-entry;
-    animation-range: entry 0% entry 42%;
+    animation-range: entry 0% entry 100%;
+  }
+
+  .staircase-section {
+    animation: floor-fade-in linear both;
+    animation-timeline: --staircase-entry;
+    animation-range: entry 50% entry 100%;
+  }
+
+  /* Staircase <-> Hallway */
+  .hallway-transition {
+    animation: level-transition linear both;
+    animation-timeline: --hallway-entry;
+    animation-range: entry 0% entry 100%;
+  }
+
+  .hallway-section {
+    animation: floor-fade-in linear both;
+    animation-timeline: --hallway-entry;
+    animation-range: entry 50% entry 100%;
   }
 }
 
@@ -1351,10 +1541,10 @@ footer a {
     animation: none;
   }
 
-  .portfolio::after,
-  .portfolio::before,
+  .level-transition-overlay,
   .explore-section,
-  .staircase-section {
+  .staircase-section,
+  .hallway-section {
     animation: none;
   }
 }
@@ -1504,22 +1694,31 @@ footer a {
     background-repeat: no-repeat;
   }
 
-  .staircase-section {
+  .staircase-section,
+  .hallway-section {
     height: 150svh;
   }
 
-  .staircase-canvas {
+  .staircase-canvas,
+  .hallway-canvas {
     transform: translateY(22svh);
   }
 
-  .staircase-heading {
+  .staircase-heading,
+  .hallway-heading {
     bottom: 8vh;
     left: 5%;
   }
 
-  .staircase-back {
+  .staircase-back,
+  .hallway-back {
     bottom: 8vh;
     right: 5%;
+  }
+
+  .staircase-next {
+    bottom: 8vh;
+    right: calc(5% + 140px);
   }
 
   .floor-next {
