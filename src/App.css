@@ -26,22 +26,11 @@ a {
   timeline-scope: --floor-entry, --staircase-entry, --hallway-entry;
 }
 
-.portfolio::before {
+.level-transition-overlay {
   position: fixed;
   z-index: 10;
   inset: 0;
   background: #080b18;
-  content: '';
-  opacity: 0;
-  pointer-events: none;
-}
-
-.portfolio::after {
-  position: fixed;
-  z-index: 10;
-  inset: 0;
-  background: #080b18;
-  content: '';
   opacity: 0;
   pointer-events: none;
 }
@@ -1367,7 +1356,8 @@ a {
 }
 
 @supports (animation-timeline: view()) {
-  .portfolio::after {
+  /* Landing <-> FirstFloor */
+  .floor-transition {
     animation: level-transition linear both;
     animation-timeline: --floor-entry;
     animation-range: entry 0% entry 100%;
@@ -1379,10 +1369,30 @@ a {
     animation-range: entry 50% entry 100%;
   }
 
-  .portfolio::before {
+  /* FirstFloor <-> Staircase */
+  .staircase-transition {
     animation: level-transition linear both;
     animation-timeline: --staircase-entry;
-    animation-range: entry 0% entry 42%;
+    animation-range: entry 0% entry 100%;
+  }
+
+  .staircase-section {
+    animation: floor-fade-in linear both;
+    animation-timeline: --staircase-entry;
+    animation-range: entry 50% entry 100%;
+  }
+
+  /* Staircase <-> Hallway */
+  .hallway-transition {
+    animation: level-transition linear both;
+    animation-timeline: --hallway-entry;
+    animation-range: entry 0% entry 100%;
+  }
+
+  .hallway-section {
+    animation: floor-fade-in linear both;
+    animation-timeline: --hallway-entry;
+    animation-range: entry 50% entry 100%;
   }
 }
 
@@ -1531,8 +1541,7 @@ footer a {
     animation: none;
   }
 
-  .portfolio::after,
-  .portfolio::before,
+  .level-transition-overlay,
   .explore-section,
   .staircase-section,
   .hallway-section {

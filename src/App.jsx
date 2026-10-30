@@ -8,6 +8,9 @@ import Hallway from './components/Hallway'
 function App() {
   return (
     <main className="portfolio">
+      <div className="level-transition-overlay floor-transition" aria-hidden="true" />
+      <div className="level-transition-overlay staircase-transition" aria-hidden="true" />
+      <div className="level-transition-overlay hallway-transition" aria-hidden="true" />
       <Landing />
       <FirstFloor />
       <Staircase />
