@@ -23,14 +23,24 @@ a {
 
 .portfolio {
   width: 100%;
-  timeline-scope: --floor-entry, --staircase-entry, --hallway-entry;
+  timeline-scope: --floor-entry, --staircase-entry, --hallway-entry, --certificate-entry;
+}
+
+[data-floor] {
+  transition: opacity 180ms ease, visibility 0s linear 180ms;
+}
+
+[data-floor].floor-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .level-transition-overlay {
   position: fixed;
   z-index: 10;
   inset: 0;
-  background: #080b18;
+  background: #000;
   opacity: 0;
   pointer-events: none;
 }
@@ -399,6 +409,21 @@ a {
   background-color: #d7cebc;
 }
 
+.hallway-next {
+  position: absolute;
+  z-index: 4;
+  right: calc(5% + 140px);
+  bottom: 9vh;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #171725;
+  font-size: 13px;
+  text-decoration: none;
+  border-bottom: 1px solid #17172588;
+  padding-bottom: 4px;
+}
+
 .hallway-section {
   position: relative;
   height: 200svh;
@@ -547,6 +572,179 @@ a {
 
 .hallway-page .gallery-card:nth-child(n) {
   margin-top: 40px !important;
+}
+
+.certificate-floor {
+  position: relative;
+  height: 190svh;
+  background: #d7cebc;
+  view-timeline-name: --certificate-entry;
+  view-timeline-axis: block;
+}
+
+.certificate-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  padding: clamp(56px, 8vh, 88px) 24px 96px;
+  color: #272821;
+  background-color: #d7cebc;
+  background-image:
+    radial-gradient(ellipse at 18% 22%, #ffffff38 0 1px, transparent 1.5px),
+    radial-gradient(ellipse at 76% 65%, #62574612 0 1px, transparent 1.7px),
+    repeating-linear-gradient(2deg, transparent 0 37px, #62574608 38px, transparent 39px 74px);
+}
+
+.certificate-canvas {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: translateY(24svh);
+  pointer-events: none;
+}
+
+.certificate-wall {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 1000px);
+  margin: 0 auto;
+}
+
+.certificate-wall-heading {
+  max-width: 700px;
+  margin: 0 auto 34px;
+  text-align: center;
+}
+
+.certificate-wall-heading h1 {
+  margin: 0 0 12px;
+  color: #25271f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 500;
+}
+
+.certificate-wall-heading > p:last-child {
+  color: #57574e;
+  font-size: 14px;
+}
+
+.certificate-row {
+  display: grid;
+  gap: clamp(14px, 3vw, 32px);
+}
+
+.certificate-row-two {
+  width: min(60%, 600px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 auto;
+}
+
+.certificate-row-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: clamp(20px, 3vh, 30px);
+}
+
+.certificate-gallery {
+  display: grid;
+  gap: clamp(20px, 3vh, 30px);
+}
+
+.certificate-card {
+  border: 5px solid #3b2d1e;
+  padding: 7px;
+  background: linear-gradient(135deg, #261e16, #6b5134 52%, #30261b);
+  box-shadow: 0 14px 28px #080b1859, 0 3px 7px #080b1866;
+}
+
+.certificate-paper {
+  position: relative;
+  display: flex;
+  min-height: 150px;
+  aspect-ratio: 1.42 / 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  overflow: hidden;
+  border: 1px solid #a68b5e;
+  outline: 1px solid #a68b5e;
+  outline-offset: -6px;
+  padding: 22px;
+  background:
+    radial-gradient(ellipse at center, #fffdf5 0, #f1e7d0 100%);
+  color: #453722;
+  text-align: center;
+}
+
+.certificate-label {
+  color: #7d6948;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.certificate-paper h2 {
+  max-width: 100%;
+  margin: 0;
+  color: #44351f;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(15px, 2vw, 22px);
+  font-weight: 500;
+}
+
+.certificate-caption {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  color: #82765f;
+  font-size: 9px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.certificate-seal {
+  width: 23px;
+  aspect-ratio: 1;
+  border: 1px solid #9a7946;
+  border-radius: 50%;
+}
+
+.certificate-navigation {
+  position: absolute;
+  z-index: 4;
+  right: max(24px, calc((100% - 1000px) / 2));
+  bottom: 28px;
+  left: max(24px, calc((100% - 1000px) / 2));
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #272821;
+  text-transform: uppercase;
+}
+
+.certificate-navigation a {
+  text-decoration: none;
+  border-bottom: 1px solid #27282188;
+  padding-bottom: 4px;
+}
+
+.certificate-error {
+  position: absolute;
+  z-index: 4;
+  right: 24px;
+  bottom: 58px;
+  left: 24px;
+  color: #ffc2b8;
+  font-size: 12px;
+  text-align: center;
 }
 
 .project-status {
@@ -1376,7 +1574,7 @@ a {
     animation-range: entry 0% entry 100%;
   }
 
-  .staircase-section {
+  .staircase-sticky {
     animation: floor-fade-in linear both;
     animation-timeline: --staircase-entry;
     animation-range: entry 50% entry 100%;
@@ -1389,9 +1587,21 @@ a {
     animation-range: entry 0% entry 100%;
   }
 
-  .hallway-section {
+  .hallway-sticky {
     animation: floor-fade-in linear both;
     animation-timeline: --hallway-entry;
+    animation-range: entry 50% entry 100%;
+  }
+
+  .certificate-transition {
+    animation: level-transition linear both;
+    animation-timeline: --certificate-entry;
+    animation-range: entry 0% entry 100%;
+  }
+
+  .certificate-sticky {
+    animation: floor-fade-in linear both;
+    animation-timeline: --certificate-entry;
     animation-range: entry 50% entry 100%;
   }
 }
@@ -1544,7 +1754,8 @@ footer a {
   .level-transition-overlay,
   .explore-section,
   .staircase-section,
-  .hallway-section {
+  .hallway-section,
+  .certificate-sticky {
     animation: none;
   }
 }
@@ -1694,20 +1905,210 @@ footer a {
     background-repeat: no-repeat;
   }
 
-  .staircase-section,
+  .certificate-floor {
+    height: 180svh;
+  }
+
+  .certificate-sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    min-height: 100svh;
+    overflow: visible;
+    padding: 44px 18px 70px;
+    background-position: center;
+  }
+
+  .certificate-wall {
+    overflow: visible;
+  }
+
+  .certificate-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    transform: none;
+  }
+
+  .certificate-row-two,
+  .certificate-row-three {
+    display: contents;
+  }
+
+  .certificate-row-two,
+  .certificate-row-three {
+    width: auto;
+    margin: 0;
+  }
+
+  .certificate-wall-heading {
+    margin-bottom: 40px;
+  }
+
+  .certificate-label {
+    font-size: 7px;
+    letter-spacing: 0.15em;
+  }
+
+  .certificate-paper h2 {
+    width: 100%;
+  }
+
+  .certificate-row {
+    gap: 12px;
+  }
+
+  .certificate-card {
+    border-width: 3px;
+    padding: 4px;
+  }
+
+  .certificate-paper {
+    width: 100%;
+    min-width: 0;
+    min-height: 120px;
+    gap: 7px;
+    padding: 14px 8px;
+  }
+
+  .certificate-paper h2 {
+    font-size: clamp(10px, 2.4vw, 18px);
+  }
+
+  .certificate-caption {
+    font-size: 8px;
+  }
+
+  .hallway-page .gallery-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    overflow: visible;
+    padding: 8px 18px 20px;
+    transform: none;
+    scrollbar-width: none;
+  }
+
+  .staircase-page .gallery-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    overflow: visible;
+    padding: 8px 18px 20px;
+    transform: none;
+    scrollbar-width: none;
+  }
+
+  .staircase-page .gallery-card {
+    min-width: 0;
+    margin: 0 !important;
+    opacity: 1;
+    translate: none;
+  }
+
+  .hallway-page .gallery-card {
+    min-width: 0;
+    margin: 0 !important;
+    opacity: 1;
+    translate: none;
+  }
+
+  .staircase-section {
+    height: auto;
+    min-height: 100svh;
+  }
+
   .hallway-section {
-    height: 150svh;
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .staircase-sticky,
+  .hallway-sticky {
+    position: relative;
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
+  .staircase-page .gallery-wall.embedded,
+  .hallway-page .gallery-wall.embedded {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    height: auto;
+    overflow: visible;
+    padding: 22px 0 180px;
+    opacity: 1;
+    transform: none;
+  }
+
+  .staircase-page .gallery-wall-inner,
+  .hallway-page .gallery-wall-inner {
+    height: auto;
+  }
+
+  .staircase-page .gallery-card:nth-child(n),
+  .hallway-page .gallery-card:nth-child(n) {
+    margin-top: 0 !important;
   }
 
   .staircase-canvas,
-  .hallway-canvas {
-    transform: translateY(22svh);
+  .hallway-canvas,
+  .certificate-canvas {
+    position: sticky;
+    top: 0;
+    flex: 0 0 100svh;
+    height: 100svh;
+    margin-bottom: -100svh;
+    transform: none;
+    z-index: 1;
+  }
+
+  .staircase-page .gallery-wall.embedded,
+  .hallway-page .gallery-wall.embedded,
+  .certificate-wall {
+    z-index: 2;
+  }
+
+  .certificate-gallery {
+    position: relative;
+    z-index: 2;
+    gap: 12px;
+  }
+
+  .staircase-heading,
+  .hallway-heading {
+    position: absolute;
+    z-index: 4;
+  }
+
+  .staircase-scroll-cue,
+  .hallway-scroll-cue {
+    display: none;
+  }
+
+  .staircase-page .gallery-card:nth-child(1),
+  .staircase-page .gallery-card:nth-child(2),
+  .staircase-page .gallery-card:nth-child(3),
+  .hallway-page .gallery-card:nth-child(1),
+  .hallway-page .gallery-card:nth-child(2),
+  .hallway-page .gallery-card:nth-child(3) {
+    margin-top: 0 !important;
   }
 
   .staircase-heading,
   .hallway-heading {
     bottom: 8vh;
     left: 5%;
+  }
+
+  .hallway-next {
+    right: calc(5% + 140px);
+    bottom: 8vh;
   }
 
   .staircase-back,

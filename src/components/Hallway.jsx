@@ -15,6 +15,30 @@ function Hallway() {
 
   useEffect(() => {
     const section = sectionRef.current
+    const gallery = galleryRef.current
+    if (!section || !gallery) return undefined
+
+    const updateGallery = () => {
+      const bounds = section.getBoundingClientRect()
+      const scrollableDistance = Math.max(1, section.offsetHeight - window.innerHeight)
+      const progress = Math.max(0, Math.min(1, -bounds.top / scrollableDistance))
+      const transitionProgress = Math.max(0, Math.min(1, progress / 0.35))
+      const easedTransition = transitionProgress ** 2 * (3 - 2 * transitionProgress)
+      gallery.style.setProperty('--wall-enter', String(easedTransition))
+    }
+
+    window.addEventListener('resize', updateGallery)
+    window.addEventListener('scroll', updateGallery, { passive: true })
+    updateGallery()
+
+    return () => {
+      window.removeEventListener('resize', updateGallery)
+      window.removeEventListener('scroll', updateGallery)
+    }
+  }, [])
+
+  useEffect(() => {
+    const section = sectionRef.current
     const canvas = canvasRef.current
     if (!section || !canvas) return undefined
 
@@ -204,7 +228,6 @@ function Hallway() {
 
         const scrollableDistance = Math.max(1, section.offsetHeight - window.innerHeight)
         const progress = THREE.MathUtils.clamp(-bounds.top / scrollableDistance, 0, 1)
-
         // Calculate transition progress along with scroll (0 to 1 over first 35% of hallway scroll)
         const transitionFactor = THREE.MathUtils.clamp(progress / TRANSITION_THRESHOLD, 0, 1)
         const easedTransition = reducedMotion
@@ -218,9 +241,6 @@ function Hallway() {
           // Background/model rotates about 45 degrees clockwise into place (Math.PI / 4 -> 0)
           modelGroup.rotation.y = (Math.PI / 4) * (1 - easedTransition)
         }
-
-        // Gallery wall background rises from bottom up into current position
-        galleryRef.current?.style.setProperty('--wall-enter', String(easedTransition))
 
         if (progress < TRANSITION_THRESHOLD) {
           // While transition is moving into place: keep character in idle
@@ -303,13 +323,17 @@ function Hallway() {
       )
 
       const handleScroll = () => updateScrollFrame()
-      window.addEventListener('resize', resize)
+      const handleResize = () => {
+        resize()
+        updateScrollFrame()
+      }
+      window.addEventListener('resize', handleResize)
       window.addEventListener('scroll', handleScroll, { passive: true })
       resize()
       updateScrollFrame()
 
       cleanupScene = () => {
-        window.removeEventListener('resize', resize)
+        window.removeEventListener('resize', handleResize)
         window.removeEventListener('scroll', handleScroll)
         stopLiveAnimation()
         mixer?.removeEventListener('finished', handleAnimationFinished)
@@ -342,7 +366,7 @@ function Hallway() {
   }, [])
 
   return (
-    <section className="hallway-page" id="hallway">
+    <section className="hallway-page" id="hallway" data-floor="hallway">
       <div className="hallway-section" ref={sectionRef}>
         <div className="hallway-sticky">
           <ProjectGallery
@@ -364,6 +388,7 @@ function Hallway() {
             <h2>Hallway</h2>
           </div>
           <a className="hallway-back" href="#staircase">Back to staircase</a>
+          <a className="hallway-next" href="#certificates">To certificates <span aria-hidden="true">↓</span></a>
           {loadError && <p className="hallway-error">The hallway scene could not be loaded.</p>}
           <span className="hallway-scroll-cue" aria-hidden="true">Scroll to proceed</span>
         </div>
