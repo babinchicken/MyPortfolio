@@ -1,6 +1,6 @@
 function Landing() {
   return (
-    <section className="hero-screen" id="home">
+    <section className="hero-screen" id="home" data-floor="home">
       <header className="project-gallery"></header>
 
       <a className="scroll-cue" href="#explore">

@@ -18,7 +18,7 @@ function FirstFloor() {
   }, [activeDetail])
 
   return (
-    <section className="explore-section" id="explore">
+    <section className="explore-section" id="explore" data-floor="explore">
       <div className="floor-scene" aria-label="Interactive room scene">
         <button
           className="room-hotspot tv-hotspot"

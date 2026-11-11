@@ -349,7 +349,7 @@ function Staircase() {
   }, [])
 
   return (
-    <section className="staircase-page" id="staircase">
+    <section className="staircase-page" id="staircase" data-floor="staircase">
       <div className="staircase-section" ref={sectionRef}>
         <div className="staircase-sticky">
           <ProjectGallery embedded galleryRef={galleryRef} id="staircase-projects" />
