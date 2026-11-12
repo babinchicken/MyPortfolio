@@ -1,0 +1,62 @@
+{
+  "certificates": [],
+  "education": [
+    {
+      "institution": "Asia e University",
+      "location": "Selangor, Malaysia",
+      "qualification": "Master of Business Administration",
+      "start_year": 2022,
+      "end_year": 2024
+    },
+    {
+      "institution": "Tribhuvan University",
+      "location": "Kathmandu, Nepal",
+      "qualification": "Bachelor of Science in Computer Science and Information Technology",
+      "start_year": 2014,
+      "end_year": 2020
+    }
+  ],
+  "work_experience": [
+    {
+      "job_title": "Android Developer",
+      "company": "Amsoft Technologies",
+      "start_date": "2018-02",
+      "end_date": "2018-12",
+      "responsibilities": [
+        "Developed 3+ Android applications using Java.",
+        "Designed databases using SQLite for Android applications."
+      ]
+    },
+    {
+      "job_title": "Android Developer",
+      "company": "Vines Software",
+      "start_date": "2019-01",
+      "end_date": "2019-03",
+      "responsibilities": [
+        "Worked on an Android application project and its PHP backend using CodeIgniter."
+      ]
+    },
+    {
+      "job_title": "Software Developer",
+      "company": "Katsumok",
+      "start_date": "2019-04",
+      "end_date": "2022-03",
+      "responsibilities": [
+        "Optimized and maintained a ride-sharing application, reducing critical bug resolution time and ensuring 99% uptime in production.",
+        "Developed a full-stack elderly care platform, enabling secure remote access and supporting 200+ users, using Java (Android) and Laravel (PHP).",
+        "Enhanced and supported a heartbeat auscultation application, resolving urgent bugs within 24 hours and improving reliability for real-time monitoring."
+      ]
+    },
+    {
+      "job_title": "Software Developer",
+      "company": "Gamenic Nalamiz Tech",
+      "start_date": "2022-04",
+      "end_date": "2026-04",
+      "responsibilities": [
+        "Enhanced an advertisement display kiosk application by modernizing a legacy Java (Struts2) project.",
+        "Developed a distance-calculation web application.",
+        "Developed a full-stack exercise tracking and recommendation platform using React.js and Laravel."
+      ]
+    }
+  ]
+}
